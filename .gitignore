@@ -1,0 +1,18 @@
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/instance/
+backend/.env
+backend/exports/
+backend/uploads/
+backend/*.db
+backend/*.sqlite3
+backend/celerybeat-schedule*
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.vscode/
