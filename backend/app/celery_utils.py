@@ -25,7 +25,7 @@ def create_celery(app):
         "monthly-admin-report": {
             "task": "app.tasks.send_monthly_admin_report",
             "schedule": crontab(
-                day_of_month="1",
+                day_of_month=app.config.get("MONTHLY_REPORT_DAY", "1"),
                 hour=app.config.get("MONTHLY_REPORT_HOUR", 8),
                 minute=app.config.get("MONTHLY_REPORT_MINUTE", 0),
             ),

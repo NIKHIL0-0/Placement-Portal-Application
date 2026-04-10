@@ -127,11 +127,39 @@ def export_student_applications_task(user_id: int):
             task_log.result_path = str(file_path)
             db.session.commit()
 
+        history_rows_html = ""
+        for row in rows:
+            history_rows_html += (
+                "<tr>"
+                f"<td>{row['company_name']}</td>"
+                f"<td>{row['drive_title']}</td>"
+                f"<td>{row['application_status']}</td>"
+                f"<td>{row['applied_date']}</td>"
+                f"<td>{row['latest_status_change_date']}</td>"
+                "</tr>"
+            )
+
+        if not history_rows_html:
+            history_rows_html = '<tr><td colspan="5">No applications found.</td></tr>'
+
+        email_body = (
+            f"<h3>Hello {student.user.full_name},</h3>"
+            f"<p>Your placement applications export is ready: <strong>{file_name}</strong></p>"
+            f"<p>Total applications in export: <strong>{len(rows)}</strong></p>"
+            "<h4>Placement History Summary</h4>"
+            "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;'>"
+            "<thead><tr>"
+            "<th>Company</th><th>Drive</th><th>Status</th><th>Applied Date</th><th>Latest Status Change</th>"
+            "</tr></thead>"
+            f"<tbody>{history_rows_html}</tbody>"
+            "</table>"
+        )
+
         send_email(
             current_app.config,
             student.user.email,
             "Your placement applications export is ready",
-            f"<p>Your export file is ready: {file_name}</p>",
+            email_body,
         )
         return {"file_path": str(file_path)}
     except Exception:
@@ -266,11 +294,40 @@ def export_admin_activity_report_task(user_id: int, start_date: str, end_date: s
             task_log.result_path = str(file_path)
             db.session.commit()
 
+        detail_rows_html = ""
+        for row in rows[1:]:
+            detail_rows_html += (
+                "<tr>"
+                f"<td>{row['row_type']}</td>"
+                f"<td>{row['company_name'] or '-'}</td>"
+                f"<td>{row['drive_title'] or '-'}</td>"
+                f"<td>{row['student_email'] or '-'}</td>"
+                f"<td>{row['application_status'] or '-'}</td>"
+                f"<td>{row['event_date'] or '-'}</td>"
+                "</tr>"
+            )
+
+        if not detail_rows_html:
+            detail_rows_html = '<tr><td colspan="6">No drive/application activity in selected range.</td></tr>'
+
+        email_body = (
+            f"<h3>Hello {admin_user.full_name},</h3>"
+            f"<p>Your admin activity report for <strong>{start_date}</strong> to <strong>{end_date}</strong> is ready: <strong>{file_name}</strong></p>"
+            f"<p><strong>Total drives:</strong> {len(drives)} | <strong>Total applications:</strong> {len(applications)} | <strong>Total selected:</strong> {selected_count}</p>"
+            "<h4>Report Details</h4>"
+            "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;'>"
+            "<thead><tr>"
+            "<th>Type</th><th>Company</th><th>Drive</th><th>Student Email</th><th>Status</th><th>Event Date</th>"
+            "</tr></thead>"
+            f"<tbody>{detail_rows_html}</tbody>"
+            "</table>"
+        )
+
         send_email(
             current_app.config,
             admin_user.email,
             "Admin activity report is ready",
-            f"<p>Your report for {start_date} to {end_date} is ready: {file_name}</p>",
+            email_body,
         )
         return {"file_path": str(file_path)}
     except Exception:

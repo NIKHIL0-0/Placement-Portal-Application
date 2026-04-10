@@ -51,7 +51,13 @@ def create_app(config_class=Config):
             db.session.commit()
             print("Admin created")
         else:
-            print("Admin already exists")
+            admin.email = app.config["ADMIN_EMAIL"]
+            admin.full_name = "Institute Admin"
+            admin.set_password(app.config["ADMIN_PASSWORD"])
+            admin.is_active = True
+            admin.is_blacklisted = False
+            db.session.commit()
+            print("Admin already exists; credentials and status refreshed")
 
     @app.cli.command("seed-demo")
     def seed_demo_command():

@@ -1,5 +1,12 @@
 import os
+from pathlib import Path
 from datetime import timedelta
+
+from dotenv import load_dotenv
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
 class Config:
@@ -17,10 +24,11 @@ class Config:
 
     CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/1")
     CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/2")
-    DAILY_REMINDER_HOUR = int(os.getenv("DAILY_REMINDER_HOUR", "9"))
-    DAILY_REMINDER_MINUTE = int(os.getenv("DAILY_REMINDER_MINUTE", "0"))
-    MONTHLY_REPORT_HOUR = int(os.getenv("MONTHLY_REPORT_HOUR", "8"))
-    MONTHLY_REPORT_MINUTE = int(os.getenv("MONTHLY_REPORT_MINUTE", "0"))
+    DAILY_REMINDER_HOUR = int(os.getenv("DAILY_REMINDER_HOUR", "16"))
+    DAILY_REMINDER_MINUTE = int(os.getenv("DAILY_REMINDER_MINUTE", "26"))
+    MONTHLY_REPORT_DAY = os.getenv("MONTHLY_REPORT_DAY", "10")
+    MONTHLY_REPORT_HOUR = int(os.getenv("MONTHLY_REPORT_HOUR", "16"))
+    MONTHLY_REPORT_MINUTE = int(os.getenv("MONTHLY_REPORT_MINUTE", "26"))
 
     SMTP_HOST = os.getenv("SMTP_HOST", "smtp.mailtrap.io")
     SMTP_PORT = int(os.getenv("SMTP_PORT", "2525"))
@@ -30,7 +38,7 @@ class Config:
     GOOGLE_CHAT_WEBHOOK_URL = os.getenv("GOOGLE_CHAT_WEBHOOK_URL", "")
 
     ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@institute.local")
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "change-admin-password")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads/resumes")
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", str(5 * 1024 * 1024)))

@@ -17,7 +17,7 @@ Run from `backend/`:
 1. Create virtual env (or use conda env) and activate it.
 2. Install dependencies:
    `pip install -r requirements.txt`
-3. Copy `.env.example` to `.env` and fill SMTP/secret values.
+3. Create a `.env` file (optional) and fill SMTP/secret values as needed.
 4. Initialize DB and auto-create admin:
    `python -m flask --app run.py init-db`
 5. Optional: seed demo data for fast walkthrough:

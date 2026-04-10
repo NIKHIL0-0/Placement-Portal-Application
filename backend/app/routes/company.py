@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity
 
 from ..decorators import role_required
 from ..extensions import cache, db
 from ..models import Application, ApplicationStatusHistory, CompanyProfile, InterviewSchedule, PlacementDrive
+from ..utils import send_email
 
 
 company_bp = Blueprint("company", __name__, url_prefix="/api/company")
@@ -165,6 +166,25 @@ def update_application_status(application_id):
         )
     )
     db.session.commit()
+
+    email_body = f"""
+    <h3>Application Status Update</h3>
+    <p>Hello {app.student.user.full_name},</p>
+    <p>Your application status has been updated by {company.company_name}.</p>
+    <ul>
+      <li><strong>Company:</strong> {company.company_name}</li>
+      <li><strong>Drive:</strong> {app.drive.job_title}</li>
+      <li><strong>Previous Status:</strong> {previous_status}</li>
+      <li><strong>Current Status:</strong> {status}</li>
+    </ul>
+    """
+    send_email(
+        current_app.config,
+        app.student.user.email,
+        f"Application update: {status}",
+        email_body,
+    )
+
     _safe_cache_clear()
     return jsonify({"message": "Application status updated"})
 

@@ -6,19 +6,24 @@ from urllib import request as urllib_request
 from email.mime.text import MIMEText
 
 
-def send_email(config, to_email: str, subject: str, html_body: str) -> None:
+def send_email(config, to_email: str, subject: str, html_body: str) -> bool:
     if not config.get("SMTP_USER") or not config.get("SMTP_PASS"):
-        return
+        return False
 
     msg = MIMEText(html_body, "html")
     msg["Subject"] = subject
     msg["From"] = config["SMTP_FROM"]
     msg["To"] = to_email
 
-    with smtplib.SMTP(config["SMTP_HOST"], config["SMTP_PORT"]) as server:
-        server.starttls()
-        server.login(config["SMTP_USER"], config["SMTP_PASS"])
-        server.sendmail(config["SMTP_FROM"], [to_email], msg.as_string())
+    try:
+        with smtplib.SMTP(config["SMTP_HOST"], config["SMTP_PORT"]) as server:
+            server.starttls()
+            server.login(config["SMTP_USER"], config["SMTP_PASS"])
+            server.sendmail(config["SMTP_FROM"], [to_email], msg.as_string())
+        return True
+    except (smtplib.SMTPException, OSError):
+        # Keep background tasks resilient even when SMTP provider throttles.
+        return False
 
 
 def send_google_chat_message(config, text: str) -> bool:
